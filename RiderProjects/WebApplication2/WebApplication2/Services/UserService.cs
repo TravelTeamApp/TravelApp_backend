@@ -30,4 +30,50 @@ public class UserService
         await _context.SaveChangesAsync();
         return true;
     }
+    // Find user by email
+    public async Task<User?> FindUserByEmail(string email)
+    {
+        // E-posta geçerliliğini kontrol et
+        if (string.IsNullOrEmpty(email))
+        {
+            return null; // Geçersiz e-posta
+        }
+
+        // E-posta adresiyle kullanıcıyı veritabanından sorgula
+        var user = await _context.Users
+            .Where(u => u.Email == email)
+            .FirstOrDefaultAsync();
+
+        return user;
+    }
+
+    // E-posta formatının geçerli olup olmadığını kontrol eden basit bir fonksiyon
+    /*private bool IsValidEmail(string email)
+    {
+        try
+        {
+            var mailAddress = new System.Net.Mail.MailAddress(email);
+            return mailAddress.Address == email;
+        }
+        catch
+        {
+            return false;
+        }
+    }*/
+    public async Task<bool> UpdateUser(User user)
+    {
+        try
+        {
+            _context.Users.Update(user); // Kullanıcıyı günceller
+            await _context.SaveChangesAsync(); // Değişiklikleri veritabanına uygular
+            return true;
+        }
+        catch (Exception ex)
+        {
+            // Güncelleme sırasında hata yönetimi
+            Console.WriteLine($"Error updating user: {ex.Message}");
+            return false;
+        }
+    }
+
 }

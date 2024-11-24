@@ -50,4 +50,51 @@ public class UserController : ControllerBase
         _logger.LogInformation("User logged in successfully: {Email}", user?.Email);
         return Ok(user);
     }
+    [HttpPost("forgot-password")]
+    public async Task<IActionResult> ForgotPassword([FromBody] User request)
+    {
+        if (string.IsNullOrEmpty(request?.Email))
+        {
+            return BadRequest("Email is required.");
+        }
+
+        _logger.LogInformation("Forgot password request for email: {Email}", request.Email);
+
+        // Kullanıcıyı email ile bul
+        var user = await _userService.FindUserByEmail(request.Email);
+        if (user == null)
+        {
+            _logger.LogWarning("User not found with email: {Email}", request.Email);
+            return BadRequest(new { message = "User not found." });
+        }
+
+        _logger.LogInformation("User found with email: {Email}, updating password to TC Kimlik number.", request.Email);
+
+        // Kullanıcının TC Kimlik bilgisi var mı kontrol edin
+        if (string.IsNullOrEmpty(user.TCKimlik))
+        {
+            _logger.LogWarning("TC Kimlik number is missing for user with email: {Email}", request.Email);
+            return BadRequest(new { message = "TC Kimlik number not found for user." });
+        }
+
+        // Şifreyi TC Kimlik olarak güncelle
+        user.Password = user.TCKimlik;
+
+        // Kullanıcıyı güncelle (veritabanında)
+        var updateResult = await _userService.UpdateUser(user);
+        if (!updateResult)
+        {
+            _logger.LogError("Failed to update password for user with email: {Email}", request.Email);
+            return StatusCode(500, new { message = "Failed to update password." });
+        }
+
+        _logger.LogInformation("Password successfully updated to TC Kimlik for user with email: {Email}", request.Email);
+
+        // Yanıt döndür
+        return Ok(new { tckimlik = user.TCKimlik, message = "Password successfully updated." });
+    }
 }
+
+
+    
+
