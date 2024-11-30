@@ -75,5 +75,10 @@ public class UserService
             return false;
         }
     }
+    public async Task<User?> GetUserById(int userId)
+    {
+        return await _context.Users.FirstOrDefaultAsync(u => u.UserID == userId);
+    }
+
 
 }

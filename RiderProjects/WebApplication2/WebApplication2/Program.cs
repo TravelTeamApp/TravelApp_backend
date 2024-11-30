@@ -5,49 +5,64 @@ using WebApplication2.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Add services to the container
 builder.Services.AddControllers();
 
-// Swagger'ı ekliyoruz
+// Add Swagger support
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Veritabanı bağlantısını yapıyoruz
+// Set up the database connection
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(
         builder.Configuration.GetConnectionString("DefaultConnection"),
         new MySqlServerVersion(new Version(8, 0, 32))
     ));
 
-// CORS yapılandırması ekliyoruz
+// Add CORS configuration
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
     {
-        // Geliştirme ortamında sadece localhost:3000'e izin veriyoruz
-        policy.WithOrigins("http://localhost:3000")  // Frontend'inizin portu
-            .AllowAnyMethod()  // Herhangi bir HTTP metoduna izin veriyoruz
-            .AllowAnyHeader(); // Herhangi bir header'a izin veriyoruz
+        // Allow only localhost:3000 during development for frontend (React/Vue etc.)
+        policy.WithOrigins("http://localhost:3000")
+            .AllowAnyMethod()  // Allow all HTTP methods (GET, POST, PUT, DELETE etc.)
+            .AllowAnyHeader(); // Allow all headers
     });
 });
 
-// UserService servisinin bağımlılığı
+// Add the UserService dependency
 builder.Services.AddScoped<UserService>();
+
+// Add session support
+builder.Services.AddDistributedMemoryCache(); // In-memory cache for sessions
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30); // Session timeout duration
+    options.Cookie.HttpOnly = true; // Makes cookies accessible only by the server
+    options.Cookie.IsEssential = true; // Essential cookie required by GDPR
+});
 
 var app = builder.Build();
 
-// Swagger'ı geliştirme ortamında aktif ediyoruz
+// Enable Swagger in development
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger(); // Swagger middleware'ini ekliyoruz
-    app.UseSwaggerUI(); // Swagger UI'yi aktif ediyoruz
+    app.UseSwagger(); // Enable Swagger middleware
+    app.UseSwaggerUI(); // Enable Swagger UI
 }
 
-// CORS politikasını uyguluyoruz
-app.UseCors("AllowAll");  // CORS middleware'ini burada ekliyoruz
+// Apply CORS policy
+app.UseCors("AllowAll"); // CORS middleware
 
-// app.UseHttpsRedirection();
+// Enable session support
+app.UseSession(); // Make sure session middleware is added before routing
+
+// Enable authorization
 app.UseAuthorization();
+
+// Map controllers
 app.MapControllers();
 
+// Run the app
 app.Run();

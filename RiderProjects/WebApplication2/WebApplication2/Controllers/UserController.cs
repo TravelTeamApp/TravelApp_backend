@@ -46,7 +46,9 @@ public class UserController : ControllerBase
             _logger.LogWarning("Invalid credentials for email: {Email}", loginRequest?.Email);
             return Unauthorized("Invalid credentials.");
         }
-
+        // Kullanıcı bilgilerini Session'a kaydet
+        HttpContext.Session.SetString("UserId", user.UserID.ToString());
+        HttpContext.Session.SetString("Email", user.Email);
         _logger.LogInformation("User logged in successfully: {Email}", user?.Email);
         return Ok(user);
     }
@@ -93,6 +95,34 @@ public class UserController : ControllerBase
         // Yanıt döndür
         return Ok(new { tckimlik = user.TCKimlik, message = "Password successfully updated." });
     }
+    [HttpGet("profile")]
+    public async Task<IActionResult> GetProfile()
+    {
+        var userIdString = HttpContext.Session.GetString("UserId");
+        if (string.IsNullOrEmpty(userIdString) || !int.TryParse(userIdString, out int userId))
+        {
+            return Unauthorized(new { message = "User not authenticated." });
+        }
+
+        var user = await _userService.GetUserById(userId);
+        if (user == null)
+        {
+            return NotFound(new { message = "User not found." });
+        }
+        _logger.LogInformation("User profile get in successfully: {Email}", user?.Email);
+
+        return Ok(user);
+    }
+
+    [HttpPost("logout")]
+    public IActionResult Logout()
+    {
+        // Session'ı temizle
+        HttpContext.Session.Clear();
+        _logger.LogInformation("User logged out successfully.");
+        return Ok(new { message = "Logout successful." });
+    }
+
 }
 
 
