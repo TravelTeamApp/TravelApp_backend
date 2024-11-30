@@ -7,7 +7,7 @@ public class User
     public string? Email { get; set; }
     public string? Password { get; set; }
     public string? TCKimlik { get; set; }
-    public string? Badges { get; set; }
+    public int? Score { get; set; } = 10;
     public int? CityID { get; set; }
     public string? ProfilePicture { get; set; }
     
