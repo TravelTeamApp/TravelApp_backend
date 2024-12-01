@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using WebApplication2.Data;
+using WebApplication2.Interfaces;
 using WebApplication2.Models;
+using WebApplication2.Repository;
 using WebApplication2.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -33,8 +35,11 @@ builder.Services.AddCors(options =>
 
 // Add the UserService dependency
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<IPlaceRepository, PlaceRepository>();
+builder.Services.AddScoped<ICommentRepository, CommentRepository>();
+builder.Services.AddScoped<IUserPlaceTypeRepository, UserPlaceTypeRepository>();
 
-// Add session support
+// Eğer PlaceRepository'i de DI container'a eklemiyorsanız
 builder.Services.AddDistributedMemoryCache(); // In-memory cache for sessions
 builder.Services.AddSession(options =>
 {

@@ -1,3 +1,5 @@
+using WebApplication2.Dtos;
+
 namespace WebApplication2.Controllers;
 
 using Microsoft.AspNetCore.Mvc;
@@ -36,22 +38,39 @@ public class UserController : ControllerBase
 
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] User loginRequest)
+    public async Task<IActionResult> Login([FromBody] LoginRequestDto loginRequest)
     {
         _logger.LogInformation("Login endpoint called with email: {Email}", loginRequest?.Email);
 
+        // Kullanıcıyı doğrulama işlemi
         var user = await _userService.Authenticate(loginRequest?.Email, loginRequest?.Password);
         if (user == null)
         {
             _logger.LogWarning("Invalid credentials for email: {Email}", loginRequest?.Email);
             return Unauthorized("Invalid credentials.");
         }
+
         // Kullanıcı bilgilerini Session'a kaydet
         HttpContext.Session.SetString("UserId", user.UserID.ToString());
         HttpContext.Session.SetString("Email", user.Email);
+
         _logger.LogInformation("User logged in successfully: {Email}", user?.Email);
-        return Ok(user);
+
+        // Kullanıcı bilgilerini UserDto olarak döndür
+        var userDto = new UserDto
+        {
+            UserID = user.UserID,
+            UserName = user.UserName,
+            Email = user.Email,
+            TCKimlik = user.TCKimlik,
+            Score = user.Score,
+            ProfilePicture = user.ProfilePicture,
+            CityID = user.CityID
+        };
+
+        return Ok(userDto);
     }
+
     [HttpPost("forgot-password")]
     public async Task<IActionResult> ForgotPassword([FromBody] User request)
     {

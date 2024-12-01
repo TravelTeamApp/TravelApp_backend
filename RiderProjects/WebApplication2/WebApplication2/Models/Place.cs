@@ -1,13 +1,21 @@
-namespace WebApplication2.Models;
-
-public class Place
+namespace WebApplication2.Models
 {
-    public int PlaceID { get; set; } // Benzersiz bir kimlik
-    public string PlaceName { get; set; } // Yer adı
-    public string Address { get; set; } // Yer adresi
-    public string Description { get; set; } // Yer açıklaması
-    public double Rating { get; set; } // Yer değerlendirme puanı (örneğin 0-5 arasında)
+    public class Place
+    {
+        public int PlaceId { get; set; }              // Mekan ID
+        public string? PlaceName { get; set; }         // Mekan Adı
+        public string? PlaceAddress { get; set; }      // Mekan Adresi
+        public string? Description { get; set; }       // Mekan Açıklaması
+        public int? Rating { get; set; }               // Mekan Puanı
 
-    // Yorumlarla ilişki
-    public List<Comment> Comments { get; set; } = new List<Comment>(); // Bir yerin birden fazla yorumu olabilir
+        // Yorumlar (Comment) ile olan ilişki
+        public List<Comment>? Comments { get; set; } = new List<Comment>();
+
+        // Favoriler (Favorite) ile olan ilişki
+        public List<Favorite>? Favorites { get; set; } = new List<Favorite>();
+
+        // Mekan Türü (PlaceType) ile olan ilişki
+        public int? PlaceTypeId { get; set; }            // Yabancı anahtar
+        public PlaceType? PlaceType { get; set; } 
+    }
 }

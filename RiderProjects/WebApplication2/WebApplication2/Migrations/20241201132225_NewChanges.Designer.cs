@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebApplication2.Data;
 
@@ -11,9 +12,11 @@ using WebApplication2.Data;
 namespace WebApplication2.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241201132225_NewChanges")]
+    partial class NewChanges
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -86,34 +89,12 @@ namespace WebApplication2.Migrations
                     b.Property<string>("PlaceName")
                         .HasColumnType("longtext");
 
-                    b.Property<int?>("PlaceTypeId")
-                        .HasColumnType("int");
-
                     b.Property<int?>("Rating")
                         .HasColumnType("int");
 
                     b.HasKey("PlaceId");
 
-                    b.HasIndex("PlaceTypeId");
-
                     b.ToTable("Places");
-                });
-
-            modelBuilder.Entity("WebApplication2.Models.PlaceType", b =>
-                {
-                    b.Property<int>("PlaceTypeId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("PlaceTypeId"));
-
-                    b.Property<string>("PlaceTypeName")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.HasKey("PlaceTypeId");
-
-                    b.ToTable("PlaceTypes");
                 });
 
             modelBuilder.Entity("WebApplication2.Models.User", b =>
@@ -148,21 +129,6 @@ namespace WebApplication2.Migrations
                     b.HasKey("UserID");
 
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("WebApplication2.Models.UserPlaceType", b =>
-                {
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PlaceTypeId")
-                        .HasColumnType("int");
-
-                    b.HasKey("UserId", "PlaceTypeId");
-
-                    b.HasIndex("PlaceTypeId");
-
-                    b.ToTable("UserPlaceTypes");
                 });
 
             modelBuilder.Entity("WebApplication2.Models.Comment", b =>
@@ -201,42 +167,9 @@ namespace WebApplication2.Migrations
 
             modelBuilder.Entity("WebApplication2.Models.Place", b =>
                 {
-                    b.HasOne("WebApplication2.Models.PlaceType", "PlaceType")
-                        .WithMany()
-                        .HasForeignKey("PlaceTypeId");
-
-                    b.Navigation("PlaceType");
-                });
-
-            modelBuilder.Entity("WebApplication2.Models.UserPlaceType", b =>
-                {
-                    b.HasOne("WebApplication2.Models.PlaceType", "PlaceType")
-                        .WithMany("UserPlaceTypes")
-                        .HasForeignKey("PlaceTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("WebApplication2.Models.User", "User")
-                        .WithMany("UserPlaceTypes")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("PlaceType");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("WebApplication2.Models.Place", b =>
-                {
                     b.Navigation("Comments");
 
                     b.Navigation("Favorites");
-                });
-
-            modelBuilder.Entity("WebApplication2.Models.PlaceType", b =>
-                {
-                    b.Navigation("UserPlaceTypes");
                 });
 
             modelBuilder.Entity("WebApplication2.Models.User", b =>
@@ -244,8 +177,6 @@ namespace WebApplication2.Migrations
                     b.Navigation("Comments");
 
                     b.Navigation("Favorites");
-
-                    b.Navigation("UserPlaceTypes");
                 });
 #pragma warning restore 612, 618
         }
