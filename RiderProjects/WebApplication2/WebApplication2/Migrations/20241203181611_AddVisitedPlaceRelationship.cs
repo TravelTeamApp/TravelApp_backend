@@ -5,7 +5,7 @@
 namespace WebApplication2.Migrations
 {
     /// <inheritdoc />
-    public partial class NewChanges : Migration
+    public partial class AddVisitedPlaceRelationship : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

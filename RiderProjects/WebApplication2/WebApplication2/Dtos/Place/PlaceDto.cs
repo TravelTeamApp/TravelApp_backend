@@ -14,6 +14,6 @@ namespace WebApplication2.Dtos.Place
         // Yeni eklenen PlaceType bilgisi
         public PlaceTypeDto? PlaceType { get; set; } // Her mekanın sadece bir türü olacak
 
-        public List<CommentDto> Comments { get; set; } // Yorumlar
+        public List<CommentDto>? Comments { get; set; } // Yorumlar
     }
 }

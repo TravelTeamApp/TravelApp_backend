@@ -12,6 +12,8 @@ namespace WebApplication2.Data
         public DbSet<User> Users { get; set; }
         public DbSet<Place> Places { get; set; }
         public DbSet<Comment> Comments { get; set; }
+        public DbSet<VisitedPlace> VisitedPlaces { get; set; }
+
         public DbSet<Favorite> Favorites { get; set; }
         public DbSet<PlaceType> PlaceTypes { get; set; } 
         public DbSet<UserPlaceType> UserPlaceTypes { get; set; }  // Yeni ilişki tablosu
@@ -21,7 +23,9 @@ namespace WebApplication2.Data
             base.OnModelCreating(builder);
 
             // Favorite entity için ilişki tanımlaması
-            builder.Entity<Favorite>(x => x.HasKey(p => new { p.UserID, p.PlaceId }));
+            builder.Entity<Favorite>()
+                .HasKey(f => f.FavoriteId);
+            //builder.Entity<Favorite>(x => x.HasKey(p => new { p.UserID, p.PlaceId }));
 
             builder.Entity<Favorite>()
                 .HasOne(u => u.User)
@@ -33,6 +37,21 @@ namespace WebApplication2.Data
                 .WithMany(u => u.Favorites)
                 .HasForeignKey(p => p.PlaceId);
 
+            // Favorite entity için ilişki tanımlaması
+            builder.Entity<VisitedPlace>()
+                .HasKey(f => f.VisitedPlaceId);
+            //builder.Entity<VisitedPlaces>(x => x.HasKey(p => new { p.UserID, p.PlaceId }));
+
+            builder.Entity<VisitedPlace>()
+                .HasOne(u => u.User)
+                .WithMany(u => u.VisitedPlaces)
+                .HasForeignKey(p => p.UserID);
+
+            builder.Entity<VisitedPlace>()
+                .HasOne(u => u.Place)
+                .WithMany(u => u.VisitedPlaces)
+                .HasForeignKey(p => p.PlaceId);
+
             // Place ve PlaceType arasında bire bir ilişki kuruluyor
             builder.Entity<Place>()
                 .HasOne(p => p.PlaceType)
@@ -42,7 +61,7 @@ namespace WebApplication2.Data
             // User ile PlaceType arasında çoktan çoğa ilişki
             builder.Entity<UserPlaceType>()
                 .HasKey(ust => new { ust.UserId, ust.PlaceTypeId });
-
+            
             builder.Entity<UserPlaceType>()
                 .HasOne(ust => ust.User)
                 .WithMany(u => u.UserPlaceTypes)

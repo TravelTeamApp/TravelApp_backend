@@ -8,12 +8,11 @@ namespace WebApplication2.Models
         public string? Password { get; set; }
         public string? TCKimlik { get; set; }
         public int? Score { get; set; } = 10;
-        public int? CityID { get; set; }
-        public string? ProfilePicture { get; set; }
 
         public ICollection<Favorite> Favorites { get; set; }  // Kullanıcının favori mekanları
         public ICollection<Comment> Comments { get; set; }    // Kullanıcının yorumları
         // Kullanıcının seçebileceği Mekan Türleri
         public ICollection<UserPlaceType> UserPlaceTypes { get; set; }
+        public ICollection<VisitedPlace> VisitedPlaces { get; set; }
     }
 }

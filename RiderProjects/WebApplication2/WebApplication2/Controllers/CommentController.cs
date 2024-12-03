@@ -19,14 +19,18 @@ namespace WebApplication2.Controllers;
 
         private readonly ICommentRepository _commentRepo;
         private readonly IPlaceRepository _placeRepo;
+        private readonly IVisitedPlaceRepository _visitedPlaceRepo;
+
        
-        public CommentController(UserService userService,ApplicationDbContext context,ICommentRepository commentRepo,
+        public CommentController(IVisitedPlaceRepository visitedPlaceRepo,UserService userService,ApplicationDbContext context,ICommentRepository commentRepo,
         IPlaceRepository placeRepo)
         {
             _commentRepo = commentRepo;
             _placeRepo = placeRepo;
             _context = context;
             _userService = userService;
+            _visitedPlaceRepo = visitedPlaceRepo;
+            
 
         }
 
@@ -60,6 +64,37 @@ namespace WebApplication2.Controllers;
             return Ok(comment.ToCommentDto());
         }
 
+        [HttpGet("users")]
+        public async Task<IActionResult> GetUserComments()
+        {
+            // Retrieve userId from session
+            var userIdString = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(userIdString) || !int.TryParse(userIdString, out int userId))
+            {
+                return Unauthorized("User not authenticated.");
+            }
+
+            // Fetch user details
+            var appUser = await _userService.GetUserById(userId);
+            if (appUser == null)
+            {
+                return Unauthorized("User not found.");
+            }
+
+            // Fetch user's favorites using the repository function
+            var comments = await _commentRepo.GetUserCommentsAsync(userId);
+
+            // Map entities to DTOs using the extension method
+
+            var commentDto = comments.Select(s => s.ToCommentDto());
+
+            return Ok(commentDto);
+        }
+
+
+
+
+
         [HttpPost]
         [Route("{placeId:int}")]
         public async Task<IActionResult> Create([FromRoute] int placeId, [FromBody] CreateCommentDto commentDto)
@@ -74,36 +109,38 @@ namespace WebApplication2.Controllers;
                 return Unauthorized("User not authenticated.");
             }
 
-            // Fetch the place from the repository
+            // Place'yi kontrol edelim
             var place = await _placeRepo.GetByIdAsync(placeId);
-
             if (place == null)
             {
                 return BadRequest("Place does not exist");
             }
 
-            // Fetch the user based on the userId from session
+            // Kullanıcıyı kontrol edelim
             var appUser = await _userService.GetUserById(userId);
             if (appUser == null)
             {
                 return Unauthorized("User not found.");
             }
 
-            // Create the comment model and associate it with the user
+            // Kullanıcının ziyaret ettiği yerler arasında olup olmadığını kontrol edelim
+            var hasVisitedPlace = await _visitedPlaceRepo.HasVisitedAsync(userId, placeId);
+            if (!hasVisitedPlace)
+            {
+                return Unauthorized("You are not authorized to comment on this place as you haven't visited it.");
+            }
+
+            // Yorum modelini oluştur ve kullanıcıyı ilişkilendir
             var commentModel = commentDto.ToCommentFromCreate(placeId);
             commentModel.UserID = appUser.UserID;
 
-            // Save the comment to the repository
+            // Yorumu kaydet
             await _commentRepo.CreateAsync(commentModel);
 
-            // Return the created comment with a CreatedAtAction response
+            // Oluşturulan yorumu döndür
             return CreatedAtAction(nameof(GetById), new { id = commentModel.CommentId }, commentModel.ToCommentDto());
         }
 
-
-
-
-        
 
         [HttpPut]
         [Route("{id:int}")]
@@ -147,12 +184,25 @@ namespace WebApplication2.Controllers;
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            // Kullanıcı bilgilerini session'dan alıyoruz
+            var userIdString = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(userIdString) || !int.TryParse(userIdString, out int userId))
+            {
+                return Unauthorized("User not authenticated.");
+            }
+
             // Yorumun veritabanında var olup olmadığını kontrol et
             var commentModel = await _commentRepo.GetByIdAsync(id);
 
             if (commentModel == null)
             {
                 return NotFound("Comment does not exist");
+            }
+
+            // Yorumun oturum açmış kullanıcıya ait olup olmadığını kontrol et
+            if (commentModel.UserID != userId)
+            {
+                return Unauthorized("You are not authorized to delete this comment.");
             }
 
             // Yorumun silinmesini gerçekleştir

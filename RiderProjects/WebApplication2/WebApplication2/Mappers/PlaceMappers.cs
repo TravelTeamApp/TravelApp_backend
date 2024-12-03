@@ -25,8 +25,8 @@ namespace WebApplication2.Mappers
                     }
                     : null,
                     
-                // Yorumları ekliyoruz
-                Comments = placeModel.Comments.Select(c => c.ToCommentDto()).ToList()
+                 // Yorumları ekliyoruz
+               Comments = placeModel.Comments.Select(c => c.ToCommentDto()).ToList()
             };
         }
     }

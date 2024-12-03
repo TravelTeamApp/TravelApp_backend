@@ -12,7 +12,7 @@ public static class CommentMapper
             CommentId = commentModel.CommentId,
             Text = commentModel.Text,
             CreatedOn = commentModel.CreatedOn,
-            CreatedBy = commentModel.User.UserName,
+            CreatedBy = commentModel.User?.UserName ?? "Unknown",
             PlaceId = commentModel.PlaceId,
             UserID = commentModel.UserID
         };

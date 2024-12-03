@@ -5,6 +5,7 @@ using WebApplication2.Models;
 using WebApplication2.Repository;
 using WebApplication2.Services;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container
@@ -32,12 +33,14 @@ builder.Services.AddCors(options =>
             .AllowAnyHeader(); // Allow all headers
     });
 });
-
+builder.Services.AddHttpContextAccessor();
 // Add the UserService dependency
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<IPlaceRepository, PlaceRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<IUserPlaceTypeRepository, UserPlaceTypeRepository>();
+builder.Services.AddScoped<IFavoriteRepository, FavoriteRepository>();
+builder.Services.AddScoped<IVisitedPlaceRepository, VisitedPlaceRepository>();
 
 // Eğer PlaceRepository'i de DI container'a eklemiyorsanız
 builder.Services.AddDistributedMemoryCache(); // In-memory cache for sessions

@@ -1,4 +1,5 @@
 using WebApplication2.Dtos;
+using WebApplication2.Mappers;
 
 namespace WebApplication2.Controllers;
 
@@ -20,19 +21,25 @@ public class UserController : ControllerBase
     }
 
     [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] User newUser)
+    public async Task<IActionResult> Register([FromBody] RegisterRequestDto registerRequest)
     {
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
 
+        // Kullanıcı verisini User modeline dönüştür
+        var newUser = registerRequest.ToUser();
+
+        // Kullanıcıyı kaydet
         var result = await _userService.Register(newUser);
         if (!result)
         {
             return BadRequest(new { message = "Email already exists." });
         }
-
+        // Kullanıcı bilgilerini Session'a kaydet
+        HttpContext.Session.SetString("UserId", newUser.UserID.ToString());
+        HttpContext.Session.SetString("Email", newUser.Email);
         return Ok(new { message = "User registered successfully." });
     }
 
@@ -64,37 +71,36 @@ public class UserController : ControllerBase
             Email = user.Email,
             TCKimlik = user.TCKimlik,
             Score = user.Score,
-            ProfilePicture = user.ProfilePicture,
-            CityID = user.CityID
+
         };
 
         return Ok(userDto);
     }
 
     [HttpPost("forgot-password")]
-    public async Task<IActionResult> ForgotPassword([FromBody] User request)
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDto requestDto)
     {
-        if (string.IsNullOrEmpty(request?.Email))
+        if (string.IsNullOrEmpty(requestDto?.Email))
         {
             return BadRequest("Email is required.");
         }
 
-        _logger.LogInformation("Forgot password request for email: {Email}", request.Email);
+        _logger.LogInformation("Forgot password request for email: {Email}", requestDto.Email);
 
         // Kullanıcıyı email ile bul
-        var user = await _userService.FindUserByEmail(request.Email);
+        var user = await _userService.FindUserByEmail(requestDto.Email);
         if (user == null)
         {
-            _logger.LogWarning("User not found with email: {Email}", request.Email);
+            _logger.LogWarning("User not found with email: {Email}", requestDto.Email);
             return BadRequest(new { message = "User not found." });
         }
 
-        _logger.LogInformation("User found with email: {Email}, updating password to TC Kimlik number.", request.Email);
+        _logger.LogInformation("User found with email: {Email}, updating password to TC Kimlik number.", requestDto.Email);
 
         // Kullanıcının TC Kimlik bilgisi var mı kontrol edin
         if (string.IsNullOrEmpty(user.TCKimlik))
         {
-            _logger.LogWarning("TC Kimlik number is missing for user with email: {Email}", request.Email);
+            _logger.LogWarning("TC Kimlik number is missing for user with email: {Email}", requestDto.Email);
             return BadRequest(new { message = "TC Kimlik number not found for user." });
         }
 
@@ -105,15 +111,16 @@ public class UserController : ControllerBase
         var updateResult = await _userService.UpdateUser(user);
         if (!updateResult)
         {
-            _logger.LogError("Failed to update password for user with email: {Email}", request.Email);
+            _logger.LogError("Failed to update password for user with email: {Email}", requestDto.Email);
             return StatusCode(500, new { message = "Failed to update password." });
         }
 
-        _logger.LogInformation("Password successfully updated to TC Kimlik for user with email: {Email}", request.Email);
+        _logger.LogInformation("Password successfully updated to TC Kimlik for user with email: {Email}", requestDto.Email);
 
         // Yanıt döndür
         return Ok(new { tckimlik = user.TCKimlik, message = "Password successfully updated." });
     }
+
     [HttpGet("profile")]
     public async Task<IActionResult> GetProfile()
     {
@@ -129,7 +136,8 @@ public class UserController : ControllerBase
             return NotFound(new { message = "User not found." });
         }
         _logger.LogInformation("User profile get in successfully: {Email}", user?.Email);
-
+    
+    
         return Ok(user);
     }
 

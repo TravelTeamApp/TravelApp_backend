@@ -16,6 +16,7 @@ namespace WebApplication2.Models
 
         // Mekan Türü (PlaceType) ile olan ilişki
         public int? PlaceTypeId { get; set; }            // Yabancı anahtar
-        public PlaceType? PlaceType { get; set; } 
+        public PlaceType? PlaceType { get; set; }
+        public ICollection<VisitedPlace> VisitedPlaces { get; set; }
     }
 }

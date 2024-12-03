@@ -33,13 +33,13 @@ namespace WebApplication2.Migrations
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<int?>("PlaceId")
+                    b.Property<int>("PlaceId")
                         .HasColumnType("int");
 
                     b.Property<string>("Text")
                         .HasColumnType("longtext");
 
-                    b.Property<int?>("UserID")
+                    b.Property<int>("UserID")
                         .HasColumnType("int");
 
                     b.HasKey("CommentId");
@@ -53,18 +53,23 @@ namespace WebApplication2.Migrations
 
             modelBuilder.Entity("WebApplication2.Models.Favorite", b =>
                 {
-                    b.Property<int?>("UserID")
+                    b.Property<int>("FavoriteId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("FavoriteId"));
 
                     b.Property<int?>("PlaceId")
                         .HasColumnType("int");
 
-                    b.Property<int>("FavoriteId")
+                    b.Property<int?>("UserID")
                         .HasColumnType("int");
 
-                    b.HasKey("UserID", "PlaceId");
+                    b.HasKey("FavoriteId");
 
                     b.HasIndex("PlaceId");
+
+                    b.HasIndex("UserID");
 
                     b.ToTable("Favorites");
                 });
@@ -124,16 +129,10 @@ namespace WebApplication2.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("UserID"));
 
-                    b.Property<int?>("CityID")
-                        .HasColumnType("int");
-
                     b.Property<string>("Email")
                         .HasColumnType("longtext");
 
                     b.Property<string>("Password")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("ProfilePicture")
                         .HasColumnType("longtext");
 
                     b.Property<int?>("Score")
@@ -165,15 +164,42 @@ namespace WebApplication2.Migrations
                     b.ToTable("UserPlaceTypes");
                 });
 
+            modelBuilder.Entity("WebApplication2.Models.VisitedPlace", b =>
+                {
+                    b.Property<int>("VisitedPlaceId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("VisitedPlaceId"));
+
+                    b.Property<int?>("PlaceId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("UserID")
+                        .HasColumnType("int");
+
+                    b.HasKey("VisitedPlaceId");
+
+                    b.HasIndex("PlaceId");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("VisitedPlaces");
+                });
+
             modelBuilder.Entity("WebApplication2.Models.Comment", b =>
                 {
                     b.HasOne("WebApplication2.Models.Place", "Place")
                         .WithMany("Comments")
-                        .HasForeignKey("PlaceId");
+                        .HasForeignKey("PlaceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("WebApplication2.Models.User", "User")
                         .WithMany("Comments")
-                        .HasForeignKey("UserID");
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Place");
 
@@ -184,15 +210,11 @@ namespace WebApplication2.Migrations
                 {
                     b.HasOne("WebApplication2.Models.Place", "Place")
                         .WithMany("Favorites")
-                        .HasForeignKey("PlaceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("PlaceId");
 
                     b.HasOne("WebApplication2.Models.User", "User")
                         .WithMany("Favorites")
-                        .HasForeignKey("UserID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserID");
 
                     b.Navigation("Place");
 
@@ -227,11 +249,28 @@ namespace WebApplication2.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("WebApplication2.Models.VisitedPlace", b =>
+                {
+                    b.HasOne("WebApplication2.Models.Place", "Place")
+                        .WithMany("VisitedPlaces")
+                        .HasForeignKey("PlaceId");
+
+                    b.HasOne("WebApplication2.Models.User", "User")
+                        .WithMany("VisitedPlaces")
+                        .HasForeignKey("UserID");
+
+                    b.Navigation("Place");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("WebApplication2.Models.Place", b =>
                 {
                     b.Navigation("Comments");
 
                     b.Navigation("Favorites");
+
+                    b.Navigation("VisitedPlaces");
                 });
 
             modelBuilder.Entity("WebApplication2.Models.PlaceType", b =>
@@ -246,6 +285,8 @@ namespace WebApplication2.Migrations
                     b.Navigation("Favorites");
 
                     b.Navigation("UserPlaceTypes");
+
+                    b.Navigation("VisitedPlaces");
                 });
 #pragma warning restore 612, 618
         }

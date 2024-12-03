@@ -44,7 +44,16 @@ public class CommentRepository : ICommentRepository
             .ToListAsync();
     }
 
+    public async Task<List<Comment>> GetUserCommentsAsync(int userId)
+    {
      
+        return await _context.Comments.Where(f => f.UserID == userId)
+            .Include(a => a.User) 
+            .Include(c => c.Place)  
+            .OrderByDescending(c => c.CreatedOn) 
+            .ToListAsync();
+    }
+
 
     public async Task<Comment?> GetByIdAsync(int id)
     {
