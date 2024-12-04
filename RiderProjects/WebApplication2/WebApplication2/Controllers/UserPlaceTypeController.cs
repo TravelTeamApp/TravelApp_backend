@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApplication2.Data;
 using WebApplication2.DTOs;
+using WebApplication2.Dtos.PlaceType;
 using WebApplication2.Interfaces;
 using WebApplication2.Models;
 
@@ -90,6 +91,24 @@ namespace WebApplication2.Controllers
 
             return Ok(placeTypes);
         }
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllPlaceTypes()
+        {
+            // Tüm mekan türlerini al
+            var placeTypes = await _context.PlaceTypes
+                .Select(pt => new PlaceTypeDto
+                {
+                    PlaceTypeId = pt.PlaceTypeId,
+                    PlaceTypeName = pt.PlaceTypeName
+                })
+                .ToListAsync();
+
+            if (placeTypes == null || !placeTypes.Any())
+                return NotFound("No place types found.");
+
+            return Ok(placeTypes);
+        }
+
 
         // Kullanıcı ve mekan türü ilişkisinin varlığını kontrol eder
         [HttpGet("exists")]

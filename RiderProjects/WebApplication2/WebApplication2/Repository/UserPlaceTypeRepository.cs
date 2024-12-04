@@ -31,7 +31,10 @@ namespace WebApplication2.Repository
 
             return userPlaceTypes.Select(upt => upt.PlaceType).ToList();
         }
-
+        public async Task<List<PlaceType>> GetAllPlaceTypesAsync()
+        {
+            return await _context.PlaceTypes.ToListAsync();
+        }
         // Belirli bir kullanıcı ve mekan türü ilişkisinin var olup olmadığını kontrol eder
         public async Task<bool> UserPlaceTypeExistsAsync(int userId, int placeTypeId)
         {
