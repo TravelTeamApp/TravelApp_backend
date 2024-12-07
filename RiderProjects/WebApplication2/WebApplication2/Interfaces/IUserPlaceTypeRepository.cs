@@ -9,6 +9,6 @@ namespace WebApplication2.Interfaces
         Task<List<PlaceType>> GetPlaceTypesByUserIdAsync(int userId);
         Task<bool> UserPlaceTypeExistsAsync(int userId, int placeTypeId);
         Task RemoveUserPlaceTypeAsync(int userId, int placeTypeId);
-        Task<List<PlaceType>> GetAllPlaceTypesAsync();
+        
     }
 }

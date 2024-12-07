@@ -2,8 +2,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApplication2.Data;
 using WebApplication2.DTOs;
+using WebApplication2.Dtos.Comment;
+using WebApplication2.Dtos.Place;
 using WebApplication2.Dtos.PlaceType;
 using WebApplication2.Interfaces;
+using WebApplication2.Mappers;
 using WebApplication2.Models;
 
 namespace WebApplication2.Controllers
@@ -75,22 +78,28 @@ namespace WebApplication2.Controllers
         }
 
 
-        // Kullanıcının sahip olduğu mekan türlerini getirir
         [HttpGet]
         public async Task<IActionResult> GetPlaceTypesByUserId()
         {
-            // Kullanıcı ID'sini session'dan al
             var userIdString = HttpContext.Session.GetString("UserId");
             if (string.IsNullOrEmpty(userIdString) || !int.TryParse(userIdString, out int userId))
                 return Unauthorized("User not authenticated.");
 
+            // Fetch the place types by user ID using the repository method
             var placeTypes = await _userPlaceTypeRepository.GetPlaceTypesByUserIdAsync(userId);
 
             if (placeTypes == null || !placeTypes.Any())
                 return NotFound("No place types found for this user.");
 
-            return Ok(placeTypes);
+            // Map PlaceType to UserPlaceTypeDto using a mapping method
+            var placeTypeDtos = placeTypes.Select(pt => new UserPlaceTypeDto
+            {
+                PlaceTypeNames = new List<string> { pt.PlaceTypeName } // Mapping logic can be extended here
+            }).ToList();
+
+            return Ok(placeTypeDtos);
         }
+
         [HttpGet("all")]
         public async Task<IActionResult> GetAllPlaceTypes()
         {
@@ -102,14 +111,12 @@ namespace WebApplication2.Controllers
                     PlaceTypeName = pt.PlaceTypeName
                 })
                 .ToListAsync();
-
             if (placeTypes == null || !placeTypes.Any())
                 return NotFound("No place types found.");
-
             return Ok(placeTypes);
         }
-
-
+        
+        
         // Kullanıcı ve mekan türü ilişkisinin varlığını kontrol eder
         [HttpGet("exists")]
         public async Task<IActionResult> CheckUserPlaceTypeExists([FromQuery] int placeTypeId)

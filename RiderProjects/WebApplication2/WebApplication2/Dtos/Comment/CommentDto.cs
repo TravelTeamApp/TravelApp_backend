@@ -8,7 +8,6 @@ public class CommentDto
     public int PlaceId { get; set; }
     public string? Text { get; set; }
     public DateTime CreatedOn { get; set; } = DateTime.Now;
-
     public string? CreatedBy { get; set; }
     public int UserID { get; set; }
     

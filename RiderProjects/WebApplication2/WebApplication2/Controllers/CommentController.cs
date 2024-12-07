@@ -90,11 +90,7 @@ namespace WebApplication2.Controllers;
 
             return Ok(commentDto);
         }
-
-
-
-
-
+        
         [HttpPost]
         [Route("{placeId:int}")]
         public async Task<IActionResult> Create([FromRoute] int placeId, [FromBody] CreateCommentDto commentDto)

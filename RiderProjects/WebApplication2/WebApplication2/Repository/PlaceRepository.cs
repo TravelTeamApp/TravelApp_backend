@@ -76,5 +76,20 @@ namespace WebApplication2.Repository
             await _context.SaveChangesAsync();
             return true;
         }
+        
+        public async Task<List<Place>> GetPlacesByPlaceTypeIdsAsync(List<int> placeTypeIds)
+        {
+            return await _context.Places
+                .Where(p => p.PlaceTypeId.HasValue && placeTypeIds.Contains(p.PlaceTypeId.Value))
+                .Include(p => p.PlaceType) // Mekan türü ilişkisini yükle
+                .Include(p => p.Comments) // Yorumları yükle
+                .ToListAsync();
+        }
+
+
+        
+
+
+
     }
 }
