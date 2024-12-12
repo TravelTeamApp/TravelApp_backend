@@ -8,7 +8,7 @@ public class FavoriteDto
     public string? PlaceName { get; set; }
     public string? PlaceAddress { get; set; }
     public string? Description { get; set; }
-    public int? Rating { get; set; }
+    public double? Rating { get; set; }
         
     // Yeni eklenen PlaceType bilgisi
     public PlaceTypeDto? PlaceType { get; set; } // Her mekanın sadece bir türü olacak

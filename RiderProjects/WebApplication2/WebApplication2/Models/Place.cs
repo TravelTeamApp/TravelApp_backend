@@ -6,7 +6,7 @@ namespace WebApplication2.Models
         public string? PlaceName { get; set; }         // Mekan Adı
         public string? PlaceAddress { get; set; }      // Mekan Adresi
         public string? Description { get; set; }       // Mekan Açıklaması
-        public int? Rating { get; set; }               // Mekan Puanı
+        public double? Rating { get; set; }               // Mekan Puanı
 
         // Yorumlar (Comment) ile olan ilişki
         public List<Comment>? Comments { get; set; } = new List<Comment>();

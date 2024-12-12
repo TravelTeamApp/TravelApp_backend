@@ -6,7 +6,10 @@ public class Comment
     public int PlaceId { get; set; }
     public Place? Place { get; set; }
     public string? Text { get; set; }
+    
+    public int? Rate { get; set; }
     public DateTime CreatedOn { get; set; }= DateTime.Now;
     public int UserID { get; set; }
     public User? User { get; set; }
+    
 }

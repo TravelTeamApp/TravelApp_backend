@@ -8,6 +8,7 @@ namespace WebApplication2.Dtos.Comment
         [MaxLength(280, ErrorMessage = "Content cannot exceed 280 characters.")]
         public string Text { get; set; } = string.Empty;
 
+        public int? Rate { get; set; }
 
     }
 }

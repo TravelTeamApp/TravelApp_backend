@@ -12,6 +12,7 @@ public static class CommentMapper
             CommentId = commentModel.CommentId,
             Text = commentModel.Text,
             CreatedOn = commentModel.CreatedOn,
+            Rate = commentModel.Rate,
             CreatedBy = commentModel.User?.UserName ?? "Unknown",
             PlaceId = commentModel.PlaceId,
             UserID = commentModel.UserID
@@ -23,6 +24,7 @@ public static class CommentMapper
         return new Comment
         {
             Text = commentDto.Text,
+            Rate = commentDto.Rate,
             PlaceId = placeId
         };
     }
@@ -33,6 +35,7 @@ public static class CommentMapper
         {
 
             Text = commentDto.Text,
+            Rate = commentDto.Rate,
             PlaceId = placeId
         };
     }
