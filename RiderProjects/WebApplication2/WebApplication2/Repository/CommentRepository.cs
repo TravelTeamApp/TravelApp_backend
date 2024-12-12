@@ -43,6 +43,15 @@ public class CommentRepository : ICommentRepository
             .OrderByDescending(c => c.CreatedOn) 
             .ToListAsync();
     }
+    public async Task<List<Comment>> GetByPlaceIdAsync(int placeId)
+    {
+        return await _context.Comments
+            .Where(c => c.PlaceId == placeId) // PlaceId ile filtreleme
+            .Include(c => c.User) // User bilgilerini dahil et
+            .Include(c => c.Place) // Place bilgilerini dahil et
+            .OrderByDescending(c => c.CreatedOn) // En son oluşturulmuş yorumu önce getir
+            .ToListAsync();
+    }
 
     public async Task<List<Comment>> GetUserCommentsAsync(int userId)
     {

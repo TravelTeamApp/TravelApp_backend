@@ -47,6 +47,21 @@ namespace WebApplication2.Controllers;
 
             return Ok(commentDto);
         }
+        [HttpGet("place/{placeId}")]
+        public async Task<IActionResult> GetCommentsByPlaceId(int placeId)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            // placeId'ye göre yorumları al
+            var comments = await _commentRepo.GetByPlaceIdAsync(placeId);
+
+            if (comments == null || !comments.Any())
+                return NotFound("Bu mekana ait yorum bulunamadı.");
+            var commentDto = comments.Select(s => s.ToPlaceCommentDto());
+
+            return Ok(commentDto);
+        }
 
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById([FromRoute] int id)

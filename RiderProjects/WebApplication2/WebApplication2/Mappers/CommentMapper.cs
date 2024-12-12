@@ -15,6 +15,22 @@ public static class CommentMapper
             Rate = commentModel.Rate,
             CreatedBy = commentModel.User?.UserName ?? "Unknown",
             PlaceId = commentModel.PlaceId,
+            PlaceName = commentModel.Place?.PlaceName,
+            UserID = commentModel.UserID
+        };
+    }
+    
+    public static CommentDto ToPlaceCommentDto(this Comment commentModel)
+    {
+        return new CommentDto
+        {
+            CommentId = commentModel.CommentId,
+            Text = commentModel.Text,
+            CreatedOn = commentModel.CreatedOn,
+            Rate = commentModel.Rate,
+            CreatedBy = commentModel.User?.UserName ?? "Unknown",
+            PlaceId = commentModel.PlaceId,
+            PlaceName = commentModel.Place?.PlaceName,
             UserID = commentModel.UserID
         };
     }
