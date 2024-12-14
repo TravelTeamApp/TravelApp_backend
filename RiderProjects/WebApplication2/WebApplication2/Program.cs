@@ -35,12 +35,14 @@ builder.Services.AddCors(options =>
 });
 builder.Services.AddHttpContextAccessor();
 // Add the UserService dependency
-builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IPlaceRepository, PlaceRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<IUserPlaceTypeRepository, UserPlaceTypeRepository>();
 builder.Services.AddScoped<IFavoriteRepository, FavoriteRepository>();
 builder.Services.AddScoped<IVisitedPlaceRepository, VisitedPlaceRepository>();
+builder.Services.AddScoped<PlaceService>();
+builder.Services.AddScoped<UserService>();
 
 // Eğer PlaceRepository'i de DI container'a eklemiyorsanız
 builder.Services.AddDistributedMemoryCache(); // In-memory cache for sessions

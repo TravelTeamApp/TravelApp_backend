@@ -6,6 +6,7 @@ using WebApplication2.Dtos.Comment;
 using WebApplication2.Interfaces;
 using WebApplication2.Mappers;
 using WebApplication2.Models;
+using WebApplication2.Repository;
 using WebApplication2.Services;
 
 namespace WebApplication2.Controllers;
@@ -16,20 +17,22 @@ namespace WebApplication2.Controllers;
     {
         private readonly ApplicationDbContext _context;
         private readonly UserService _userService;
-
+        private readonly PlaceService _placeService;
         private readonly ICommentRepository _commentRepo;
         private readonly IPlaceRepository _placeRepo;
+
         private readonly IVisitedPlaceRepository _visitedPlaceRepo;
 
        
         public CommentController(IVisitedPlaceRepository visitedPlaceRepo,UserService userService,ApplicationDbContext context,ICommentRepository commentRepo,
-        IPlaceRepository placeRepo)
+        IPlaceRepository placeRepo,PlaceService placeService)
         {
             _commentRepo = commentRepo;
             _placeRepo = placeRepo;
             _context = context;
             _userService = userService;
             _visitedPlaceRepo = visitedPlaceRepo;
+            _placeService = placeService;
             
 
         }
@@ -140,6 +143,12 @@ namespace WebApplication2.Controllers;
             {
                 return Unauthorized("You are not authorized to comment on this place as you haven't visited it.");
             }
+            if (appUser == null)
+            {
+                return Unauthorized("User not found.");
+            }
+
+            await _userService.IncreaseUserScoreAsync(appUser, 50);
 
             // Yorum modelini oluştur ve kullanıcıyı ilişkilendir
             var commentModel = commentDto.ToCommentFromCreate(placeId);
@@ -147,6 +156,9 @@ namespace WebApplication2.Controllers;
 
             // Yorumu kaydet
             await _commentRepo.CreateAsync(commentModel);
+// After saving the comment
+            await _placeService.UpdatePlaceRatingAsync(placeId);
+
 
             // Oluşturulan yorumu döndür
             return CreatedAtAction(nameof(GetById), new { id = commentModel.CommentId }, commentModel.ToCommentDto());
@@ -183,6 +195,7 @@ namespace WebApplication2.Controllers;
 
             // Yorum güncelleme işlemi
             var updatedcomment = await _commentRepo.UpdateAsync(id, updateDto.ToCommentFromUpdate(id));
+
 
             return Ok(updatedcomment.ToCommentDto());
         }

@@ -8,4 +8,6 @@ public interface IPlaceRepository
     Task<Place?> GetByIdAsync(int id);
     Task<bool> PlaceExists(int id);
     Task<List<Place>> GetPlacesByPlaceTypeIdsAsync(List<int> placeTypeIds);
+    
+    Task UpdateRatingAsync(int placeId, double newRating);
 }

@@ -8,6 +8,8 @@ namespace WebApplication2.Repository
     public class PlaceRepository : IPlaceRepository
     {
         private readonly ApplicationDbContext _context;
+
+
         public PlaceRepository(ApplicationDbContext context)
         {
             _context = context;
@@ -85,7 +87,16 @@ namespace WebApplication2.Repository
                 .Include(p => p.Comments) // Yorumları yükle
                 .ToListAsync();
         }
-
+        public async Task UpdateRatingAsync(int placeId, double newRating)
+        {
+            var place = await _context.Places.FindAsync(placeId);
+            if (place != null)
+            {
+                place.Rating = newRating;
+                _context.Places.Update(place);
+                await _context.SaveChangesAsync();
+            }
+        }
 
         
 

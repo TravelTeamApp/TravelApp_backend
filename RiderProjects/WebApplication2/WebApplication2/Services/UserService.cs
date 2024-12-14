@@ -1,16 +1,22 @@
 using Microsoft.EntityFrameworkCore;
 using WebApplication2.Data;
+using WebApplication2.Interfaces;
 using WebApplication2.Models;
+using WebApplication2.Repository;
 
 namespace WebApplication2.Services;
 
 public class UserService
 {
     private readonly ApplicationDbContext _context;
+    private readonly IUserRepository _userRepo;
 
-    public UserService(ApplicationDbContext context)
+
+
+    public UserService(ApplicationDbContext context,IUserRepository userRepo)
     {
         _context = context;
+        _userRepo = userRepo;
     }
 
     public async Task<User?> Authenticate(string email, string password)
@@ -30,6 +36,7 @@ public class UserService
         await _context.SaveChangesAsync();
         return true;
     }
+
     // Find user by email
     public async Task<User?> FindUserByEmail(string email)
     {
@@ -75,12 +82,27 @@ public class UserService
             return false;
         }
     }
+
     public async Task<User?> GetUserById(int userId)
     {
         return await _context.Users.FirstOrDefaultAsync(u => u.UserID == userId);
     }
+
+    public async Task IncreaseUserScoreAsync(User user, int increment = 50)
+    {
+        if (user == null)
+        {
+            throw new ArgumentNullException(nameof(user), "User cannot be null.");
+        }
+
+        user.Score = (user.Score ?? 0) + increment;
     
+        if (_userRepo == null)
+        {
+            throw new InvalidOperationException("UserRepository is not initialized.");
+        }
 
-
+        await _userRepo.UpdateAsync(user);
+    }
 
 }
