@@ -15,7 +15,8 @@ namespace WebApplication2.Mappers
                 PlaceAddress = placeModel.PlaceAddress,
                 Description = placeModel.Description,
                 Rating = placeModel.Rating,
-                
+                Longitude = placeModel.Longitude,
+                Latitude = placeModel.Latitude,
                 // PlaceType bilgisini ekliyoruz
                 PlaceType = placeModel.PlaceType != null 
                     ? new PlaceTypeDto 

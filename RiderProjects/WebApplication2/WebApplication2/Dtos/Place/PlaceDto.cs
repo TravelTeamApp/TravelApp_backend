@@ -10,7 +10,8 @@ namespace WebApplication2.Dtos.Place
         public string? PlaceAddress { get; set; }
         public string? Description { get; set; }
         public double? Rating { get; set; }
-        
+        public double? Latitude { get; set; }    // Enlem
+        public double? Longitude { get; set; }   // Boylam
         // Yeni eklenen PlaceType bilgisi
         public PlaceTypeDto? PlaceType { get; set; } // Her mekanın sadece bir türü olacak
 
