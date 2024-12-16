@@ -79,6 +79,7 @@ public class CommentRepository : ICommentRepository
         }
 
         existingComment.Text = commentModel.Text;
+        existingComment.Rate=commentModel.Rate;
 
         await _context.SaveChangesAsync();
 

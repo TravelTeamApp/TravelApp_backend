@@ -53,6 +53,7 @@ public static class CommentMapper
             Text = commentDto.Text,
             Rate = commentDto.Rate,
             PlaceId = placeId
+      
         };
     }
 
